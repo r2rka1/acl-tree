@@ -23,6 +23,12 @@
 <script>
 import * as d3 from 'd3';
 import defaultConfig from "@/defaultConfig";
+import './assets/nav.png'
+import './assets/action.png'
+import './assets/submodule.png'
+import './assets/widget.png'
+import './assets/module.png'
+
 export default {
   name: 'App',
   data() {
