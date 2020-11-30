@@ -421,7 +421,6 @@ body {
     font-size: 10px;
     font-style: italic;
   }
-
   & .image {
     width: 100%;
     height: 75px;
