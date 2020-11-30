@@ -121,7 +121,7 @@ export default  [
 
   /** ========================= COMPLIANCE ========================= */
 
-  {id: 'root.compliance', type: 'module', value: 'Categories', active: true, affectsOn: ['root.categories.profile.dashboard.mavericks', 'root.categories.profile.dashboard.compliance']},
+  {id: 'root.compliance', type: 'module', value: 'Compliance', active: true, affectsOn: ['root.categories.profile.dashboard.mavericks', 'root.categories.profile.dashboard.compliance']},
 
   {id: 'root.compliance.overview', type: 'submodule', value: 'Overview', active: true},
   {id: 'root.compliance.overview.impactable_spend', type: 'widget', value: 'Impactable Spend (w)', active: true},
@@ -147,7 +147,7 @@ export default  [
 
   /** ========================= GLOBAL SEARCH ========================= */
 
-  {id: 'root.global_search', type: 'module', value: 'Categories', active: true},
+  {id: 'root.global_search', type: 'module', value: 'Global Search', active: true},
   {id: 'root.global_search.categories', type: 'action', value: 'Categories', active: true, dependencies: ['root.categories.profile']},
   {id: 'root.global_search.subcategories', type: 'action', value: 'Subcategories', active: true, dependencies: ['root.categories.profile']},
   {id: 'root.global_search.suppliers', type: 'action', value: 'Suppliers', active: true, dependencies: ['root.suppliers.profile']},
