@@ -23,11 +23,6 @@
 <script>
 import * as d3 from 'd3';
 import defaultConfig from "@/defaultConfig";
-import nav from './img/nav.png'
-import action from './img/action.png'
-import submodule from './img/submodule.png'
-import widget from './img/widget.png'
-import module from './img/module.png'
 
 export default {
   name: 'App',
@@ -40,12 +35,7 @@ export default {
       },
       root: defaultConfig,
       currentScale: 6,
-      presets: { root: [...JSON.parse(JSON.stringify(defaultConfig))] },
-      nav,
-      action,
-      submodule,
-      widget,
-      module
+      presets: { root: [...JSON.parse(JSON.stringify(defaultConfig))] }
     }
   },
   mounted() {
@@ -205,7 +195,7 @@ export default {
               <h2>${d.data.value}</h2>
               <h3>${d.data.type}</h3>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-              <img src="${this[d.data.type]}" alt="" width="100%" height="75px">
+              <div class="image ${d.data.type}"></div>
             </div>
             `
       }
@@ -431,5 +421,28 @@ body {
     font-size: 10px;
     font-style: italic;
   }
+
+  & .image {
+    width: 100%;
+    height: 75px;
+    background-size: cover;
+    &.nav {
+      background-image: url('./img/nav.png');
+    }
+    &.submodule {
+      background-image: url('./img/submodule.png');
+    }
+    &.module {
+      background-image: url('./img/module.png');
+    }
+    &.widget {
+      background-image: url('./img/widget.png');
+    }
+    &.action {
+      background-image: url('./img/action.png');
+    }
+  }
+
+
 }
 </style>
