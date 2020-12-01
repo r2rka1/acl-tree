@@ -10,8 +10,8 @@
         <input type="number" style="width: 50px" step="0.1" v-model="currentScale" @input="e => currentScale = Number(e.target.value)">
       </div>
       <div class="save">
-        <h3>Save as new preset</h3>
-        <button @click="handleSave">Save</button>
+        <h3>Create new preset</h3>
+        <button @click="handleCreate">Create</button>
         <select name="select" @change="handleInput">
           <option :key="name" v-for="(option, name) in presets" :value="name">{{name}}</option>
         </select>
@@ -48,8 +48,10 @@ export default {
     }
   },
   methods: {
-    handleSave() {
-      this.$set(this.presets, 'New Preset' + Object.values(this.presets).length, this.root)
+    handleCreate() {
+      const name = 'New Preset' + Object.values(this.presets).length
+      this.$set(this.presets, name , JSON.parse(JSON.stringify(defaultConfig)))
+      this.root = this.presets[name]
     },
     handleInput(e) {
       this.root = this.presets[e.target.value]
@@ -62,10 +64,16 @@ export default {
           .append("g").attr("transform", "translate(40,80)")
 
       const tree = d3.tree().size([15000, 2250]);
-
       const stratify = d3.stratify().parentId(d => d.id.substring(0, d.id.lastIndexOf(".")))
 
-      const root = stratify(this.root).sort((a, b) => a.height - b.height || a.id.localeCompare(b.id));
+      const root = stratify(this.root);
+
+      this.setupNodeOffests(root);
+
+      tree.separation((a, b) => {
+        if (a.parent.hasMany || b.parent.hasMany) return 0.1
+        return (a.parent === b.parent ? 0.5 : 1) / a.depth
+      })
 
       this.links = this.g.selectAll(".link")
           .data(tree(root).links()).order()
@@ -73,8 +81,8 @@ export default {
           .append("path")
           .attr("class", ({source, target}) => `link ${!target.data.active || !source.data.active ? 'inactive' : 'active'}`)
           .attr("d", d3.linkVertical()
-              .x(d => d.x)
-              .y(d => d.y/2)
+              .x(d => d.offsetX + d.x)
+              .y(d => d.offsetY + d.y/2)
           )
           .attr("id", ({source, target}) => `${source.id}--${target.id}`)
 
@@ -89,7 +97,7 @@ export default {
             className += ` ${d.data.type}`
             return className;
           })
-          .attr("transform", d => `translate(${d.x},${d.y/2})`)
+          .attr("transform", d => `translate(${d.offsetX + d.x},${d.offsetY + d.y/2})`)
           .attr("id", d => d.id)
 
       const rects = this.node.append("rect")
@@ -230,8 +238,23 @@ export default {
         d.innerText = i
         this.tooltip.appendChild(d)
       })
+    },
+    setupNodeOffests(node) {
+      node.offsetX = 0
+      node.offsetY = 0
+      if (!['root', 'module'].includes(node.data.type) && node.children && node.children.length >= 3) {
+        node.hasMany = true
+      }
+      if (node.parent && node.parent.hasMany) {
+        const idx = node.parent.children.findIndex(i => i === node);
+        node.offsetX = (((this.nodeParams.width * idx) + 20) * -1)/3
+        node.offsetY = (this.nodeParams.height * idx)
+      }
+      if (node.children) {
+        node.children.forEach(child => this.setupNodeOffests(child))
+      }
     }
-  }
+  },
 }
 </script>
 
@@ -287,13 +310,13 @@ body {
 
 .link {
   fill: transparent;
-  stroke: #118035;
+  stroke: #193B5C;
   stroke-width: 2;
 
   &.inactive {
     stroke-width: 1;
-    stroke: red;
-    opacity: 0.5;
+    stroke: #D53000;
+    opacity: 2;
   }
 }
 
@@ -307,38 +330,57 @@ body {
 .node-group {
   &.module {
     rect {
-      fill: #2797bf;
+      fill: #338F13;
+      stroke: #193B5C;
+      stroke-width: 2;
     }
   }
 
   &.submodule {
+    text {
+      stroke: #193B5C;
+      fill: #193B5C;
+    }
     rect {
-      fill: orange;
+      fill: #FEC02C;
+      stroke: #193B5C;
+      stroke-width: 2;
     }
   }
 
   &.widget {
     rect {
-      fill: purple;
+      stroke: white;
+      fill: #193B5C;
+      stroke-width: 2;
     }
   }
 
   &.action {
     rect {
-      fill: #2cd9a9;
+      fill: #854994;
+      stroke: #193B5C;
+      stroke-width: 2;
     }
   }
 
   &.nav {
     rect {
       fill: #d97d2c;
+      stroke: white;
+      stroke-width: 2;
     }
   }
 
   &.inactive {
+    text {
+      stroke: white;
+      fill: white;
+    }
     rect {
       fill: grey;
       stroke: grey;
+      stroke-width: 2;
     }
   }
 }
@@ -376,7 +418,7 @@ body {
   box-shadow: 1px 1px 12px rgba(0,0,0,.3);
   border-radius: 6px;
   text-align: left;
-  min-width: 150px;
+  min-width:250px;
   opacity: 0;
 
    .list {
